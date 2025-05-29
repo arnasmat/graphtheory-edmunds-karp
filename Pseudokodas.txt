@@ -1,0 +1,22 @@
+for each vertex v in Graph:
+    width[v] = -INF
+    previous[v] = NIL
+width[s] = INF
+Q <- all vertexes in Graph
+While Q is not empty:
+    u = vertex in Q with largest width
+    remove u from Q
+    if width[u] = -INF
+        do break;
+    for each neighbor v of u:
+        temp = max(width[v], min(width[u], width_between(u,v,)))
+        if temp>width[v]
+            do width[v] = temp
+                previous[v]=u
+
+# TODO - Patikrinti ar viskas cia gerai us tais, nes pseudokode
+# buvo be do prie if'u, tai paziuret kaip usually raso pseudokoda ifuose
+
+https://en.wikipedia.org/wiki/Widest_path_problem
+https://www.geeksforgeeks.org/widest-path-problem-practical-application-of-dijkstras-algorithm/
+https://web.vu.lt/mii/m.sabaliauskas/wp-content/uploads/2021/04/11paskaita_2021.pdf

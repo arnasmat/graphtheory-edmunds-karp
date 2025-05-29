@@ -41,6 +41,29 @@ void read_graph(std::pmr::unordered_map<int, std::vector<Edge>> &Graph , const s
     }
 }
 
+void read_matrix_graph(std::pmr::unordered_map<int, std::vector<Edge>> &Graph , const std::string &filename="../inputMatrix.txt") {
+    std::ifstream in(filename);
+    if (!in) {
+        std::cerr << "Error opening file " << filename << std::endl;
+        throw std::runtime_error("Error opening file");
+    }
+
+    std::string line;
+    int i=1;
+    while (std::getline(in, line)) {
+        std::stringstream ss(line);
+        int j{1};
+        char weight;
+        while (ss>>weight) {
+            if (weight != 'N' && weight != '0') {
+                Graph[i].push_back({j, weight-'0'});
+            }
+            j++;
+        }
+        i++;
+    }
+}
+
 void iterate_graph(std::pmr::unordered_map<int, std::vector<Edge>> &Graph) {
     for (const auto &i: Graph) {
         std::cout << i.first << " -> ";
@@ -52,26 +75,35 @@ void iterate_graph(std::pmr::unordered_map<int, std::vector<Edge>> &Graph) {
 }
 
 
-void max_flow_path(std::pmr::unordered_map<int, std::vector<Edge>> &Graph, int s, int t) {
+
+
+void max_flow_path(std::pmr::unordered_map<int, std::vector<Edge>> &Graph, int s, int t, int k) {
 
     std::pmr::unordered_map<int, std::vector<Edge> > GraphCopy = Graph;
 
     int bendras_srautas{0};
 
-    while (true) {
+    for (int l=0; l<k; l++) {
         std::pmr::unordered_map<int, int> width; //<virsune, jos width>
         std::pmr::unordered_map<int, int> previous; //<virsune, jos prev>
 
-        for (int i = 0; i < GraphCopy.size(); i++) {
-            width[i] = INT_MIN;
-            previous[i] = -1;
+        // for (int i = 0; i < GraphCopy.size(); i++) {
+        //     width[i] = INT_MIN;
+        //     previous[i] = -1;
+        // }
+        for (auto &i : GraphCopy) {
+            width[i.first] = INT_MIN;
+            previous[i.first] = -1;
         }
 
         width[s] = INT_MAX;
 
         std::priority_queue<std::pair<int,int>, std::vector<std::pair<int,int>>, CompareWeight> pq;
-        for (int i = 0; i < GraphCopy.size(); i++) {
-            pq.push({width[i], i});
+        // for (int i = 0; i < GraphCopy.size(); i++) {
+        //     pq.push({width[i], i});
+        // }
+        for (auto &i : GraphCopy) {
+            pq.push({width[i.first], i.first});
         }
 
 
@@ -93,15 +125,21 @@ void max_flow_path(std::pmr::unordered_map<int, std::vector<Edge>> &Graph, int s
 
 
         int ind = t;
-        if (width[t] < 1) {
+        if (width[t] < 1 && l!=k) {
+            std::cout<<l+1<<"-asis takas nerastas.\n";
             break;
         }
+
         while (ind != s) {
             std::cout <<"Virsune: "<< ind << "; Srautas:  "<<width[ind]<< " " <<"Praeita virsune: "<< previous[ind]<<"\n";
             ind = previous[ind];
         }
         std::cout << "\n\n";
         bendras_srautas += width[t];
+
+        if (l+1==k){
+            std::cout<<k<<"-asis srautas is eiles lygus: "<<width[t]<<"\n";
+        }
 
         modify_graph(GraphCopy, s, t, width, previous);
     }
@@ -150,11 +188,13 @@ int main() {
     std::pmr::unordered_map<int, std::vector<Edge>> Graph;
     int s{0};
     int t{5};
-    read_graph(Graph, "../i2.txt");
+    int k{3};
+    std::cout<<"iveskite s, t, k\n";
+    std::cin>>s>>t>>k;
+    // read_graph(Graph, "../i2.txt");
+    read_matrix_graph(Graph, "../inputmatrix2.txt");
     iterate_graph(Graph);
     std::cout<<"-------------------------------\n";
-    max_flow_path(Graph, s, t);
-
-
+    max_flow_path(Graph, s, t, k);
 
 }
